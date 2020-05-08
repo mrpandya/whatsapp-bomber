@@ -10,7 +10,7 @@ string=input('enter the message you want to send: ')
 driver = webdriver.Chrome('/home/manan/Desktop/fithit/chromedriver') 
 driver.get("https://web.whatsapp.com/") 
 wait = WebDriverWait(driver, 600) 
-x_arg = '//span[contains(@title,' + target + ')]'
+x_arg = '//span[contains(@title,\"' + target + '\")]'
 group_title = wait.until(EC.presence_of_element_located((By.XPATH, x_arg))) 
 group_title.click()
 
