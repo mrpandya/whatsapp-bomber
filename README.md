@@ -35,7 +35,7 @@ Extract it in a known location , as we need the location later (as mentioned in 
   <h5>Step 3: Type your message</h5>
 </p>
 <p>
-  <h5>Step 5: Scan the QR code to login into whatsapp web</h5>
+  <h5>Step 4: Scan the QR code to login into whatsapp web</h5>
 </p>
 <p>
   <h6><b>Note:</b>Try to keep that contact on top ( you can also pin that contact ) to avoid any errors </h6>
