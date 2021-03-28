@@ -11,7 +11,7 @@ To clone and run this application, you'll need [Git](https://git-scm.com) instal
 
 
 # Clone this repository
-$ git clone https://github.com/manan001022j/whatsapp-bomber
+$ git clone https://github.com/mrpandya/whatsapp-bomber
 
 
 # Install dependencies 
