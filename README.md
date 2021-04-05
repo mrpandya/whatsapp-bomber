@@ -14,7 +14,7 @@ $ git clone https://github.com/mrpandya/whatsapp-bomber
 ```
 ## Install dependencies
 ```bash
-$ pip install selenium
+$ pip install -r requirements.txt
 ```
 
  <h5> Chrome is required for this script. For Linux users Chromium browser will also work</h5>
@@ -49,7 +49,7 @@ Extract it in a known location , as we need the location later (as mentioned in 
 <p>
   <h6><b>Note : </b>Try to keep that contact on top ( you can pin that contact ) to avoid any errors </h6>
 </p>
-<h4 align='center">You're ready to go</h4>
+<h4 align='center'> You're ready to go</h4>
 <h6 align="center">Please do not try this with people who might end up blocking you because thats the last thing you would want during a pandemic <br><br><span align="center"><b>STAY HOME STAY SAFE</b></span> </h6>
 
 </br>
