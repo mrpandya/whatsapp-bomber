@@ -1,6 +1,6 @@
 <h1 align="center">WHATSAPP BOMBER</h1>
 </br>
-<h4 align="center">A script which sends multiple messages to a particular conatct/ group</h4>
+<h4 align="center">A script which sends multiple messages to a particular contact/group</h4>
 
 ## How to setup
 
