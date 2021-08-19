@@ -5,7 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By 
 import time
 
-# contact name can also be the naem of a group
+# contact name can also be the name of a group
 target=input('enter the contact name: ')
 n=int(input('enter the number of messages you want to send: '))
 string=input('enter the message you want to send: ')
