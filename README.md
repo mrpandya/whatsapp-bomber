@@ -53,10 +53,6 @@ Extract it in a known location , as we need the location later (as mentioned in 
 <h6 align="center">Please do not try this with people who might end up blocking you because thats the last thing you would want during a pandemic <br><br><span align="center"><b>STAY HOME STAY SAFE</b></span> </h6>
 
 </br>
-<p align="center">
-   <img href="http://hits.dwyl.com/mrpandya/whatsapp-bomber" src="http://hits.dwyl.com/manan001022j/whatsapp-bomber.svg"
-         alt="hits">
-</p>
 
 
 ## Aim
