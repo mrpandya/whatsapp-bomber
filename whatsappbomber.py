@@ -13,7 +13,7 @@ string=input('enter the message you want to send: ')
 flag = 0 
 try : 
     # path = Path of your chromedriver file
-    driver = webdriver.Chrome('<path>')
+    driver = webdriver.Chrome('chromedriver')
     flag = 1
 except : 
     print("Invalid Path")
