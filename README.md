@@ -24,7 +24,7 @@ $ pip install -r requirements.txt
 $ sudo apt-get install chromium-browser
 ```
 
-<h5>Download Chrome driver from here:<a href="https://chromedriver.storage.googleapis.com/index.html?path=2.25/"> Chromedriver download page</a>( choose your specific version )
+<h5>Download Chrome driver from here:<a href="https://chromedriver.storage.googleapis.com/index.html?path=2.36/"> Chromedriver download page</a>( choose your specific version )
 Extract it in a known location , as we need the location later (as mentioned in the code's comments)</h5>
 
 
