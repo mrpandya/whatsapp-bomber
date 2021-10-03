@@ -12,7 +12,7 @@ string=input('enter the message you want to send: ')
 
 try : 
     # path = Path of your chromedriver file
-    driver = webdriver.Chrome('<path>')
+    driver = webdriver.Chrome(r'YOUR_DRIVER_PATH')
     driver.get("https://web.whatsapp.com/")
     # wait for 6 seconds for whatsapp web to load and for you to login
     wait = WebDriverWait(driver, 600)
@@ -23,10 +23,10 @@ try :
     group_title.click()
     # Send the message for the number of times you have specified
     for i in range(n):
-        # select the send button which it searches using the CSS attribute
-        element=driver.find_element_by_css_selector("div[data-tab='1']")
+        # select the send button which it searches using the Xpath for the textbox
+        element=driver.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div/div/div[2]/div[1]/div/div[2]')
         element.send_keys(string+Keys.ENTER)
-except : 
+except Exception as e : 
     print("Invalid Path")
     
 
