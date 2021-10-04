@@ -4,6 +4,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys 
 from selenium.webdriver.common.by import By 
 import time
+import os
+import platform
 
 # contact name can also be the name of a group
 target=input('enter the contact name: ')
@@ -12,8 +14,15 @@ string=input('enter the message you want to send: ')
 
 flag = 0 
 try : 
-    # path = Path of your chromedriver file
-    driver = webdriver.Chrome('chromedriver')
+    os_name=platform.system()
+    if(os_name == "Windows"):
+        # for windows operating system
+        path = os.path.abspath('chromedriver.exe')
+    else:
+        # forlinux operating system
+        path = os.path.abspath('chromedriver')
+
+    driver = webdriver.Chrome(path)
     flag = 1
 except : 
     print("Invalid Path")
