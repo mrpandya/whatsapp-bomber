@@ -28,7 +28,6 @@ $ sudo apt-get install chromium-browser
 Extract it in a known location , as we need the location later (as mentioned in the code's comments)</h5>
 
 
-
 ## Steps To Follow
 
 <p>

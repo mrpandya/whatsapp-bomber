@@ -4,6 +4,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys 
 from selenium.webdriver.common.by import By 
 import time
+import os
+import platform
 
 # contact name can also be the name of a group
 target=input('enter the contact name: ')
@@ -13,6 +15,15 @@ string=input('enter the message you want to send: ')
 try : 
     # path = Path of your chromedriver file
     driver = webdriver.Chrome(r'YOUR_DRIVER_PATH')
+    os_name=platform.system()
+    if(os_name == "Windows"):
+        # for windows operating system
+        path = os.path.abspath('chromedriver.exe')
+    else:
+        # forlinux operating system
+        path = os.path.abspath('chromedriver')
+
+    driver = webdriver.Chrome(path)
     driver.get("https://web.whatsapp.com/")
     # wait for 6 seconds for whatsapp web to load and for you to login
     wait = WebDriverWait(driver, 600)
@@ -27,6 +38,6 @@ try :
         element=driver.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div/div/div[2]/div[1]/div/div[2]')
         element.send_keys(string+Keys.ENTER)
 except Exception as e : 
-    print("Invalid Path")
+    print(e.message)
     
 
