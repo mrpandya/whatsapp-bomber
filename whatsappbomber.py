@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 import time
@@ -15,6 +16,7 @@ import os
 import platform
 from colorama import Fore, init as colorama_init
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 
 ###########################
 # LIBRARY INITIALIZATIONS #
@@ -286,6 +288,7 @@ def main() -> None:
     names = get_input(f"Enter the contact/group names separated by a comma(,)")
     messages = get_input("Enter the message(s) that you want to send separated by a comma(,)")
     enable_logs = get_input("Enable logs to view progress of the bot? [ True/False ]").lower()
+    browser = get_input("Which browser to use?/What browser do you have installed? [ Chrome/FireFox ]").lower()
 
     # Convert enable logs to boolean
     if enable_logs.startswith("t") or enable_logs == "1":
@@ -314,7 +317,27 @@ def main() -> None:
     # Initialize the driver
     log("info", "Initializing web driver...")
     log("info", "Installing the web driver...")
-    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
+    # Check what browser user wished and initialize driver accordingly
+    if browser.startswith("ch"):
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    elif browser.startswith("fir"):
+        try:
+            driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        except Exception as e:
+            log("error", "Unable to automatically install geckodriver!\nTrying manual mode instead...")
+            try:
+                # Use geckodriver, assuming it is in same path
+                path = "./geckodriver" if OS.lower().startswith("lin") else "geckodriver.exe"
+                service = FirefoxService(executable_path=path)
+                driver = webdriver.Firefox(service=service)
+            except Exception as e:
+                log("error", "Unable to get geckodriver manually!")
+                log("info", "Quitting...")
+                sys.exit()
+    else:
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
     log("success", "Successfully initialized web driver!")
 
     # Start the bot
