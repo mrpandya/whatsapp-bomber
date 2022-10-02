@@ -6,7 +6,8 @@ import sys
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC 
-from selenium.webdriver.common.keys import Keys 
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 import time
@@ -189,19 +190,26 @@ def start_bot(names: list, messages: list, driver: any) -> None:
                 text_box = wait.until(EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]")))
                 text_box.click()
 
+                # Loop through messages list and send them one by one
                 log("info", "Sending messages", hierarchy_level=1)
                 for message in messages:
                     log(f"info", f"Writing: {message}", hierarchy_level=2)
                     text_box.send_keys(message)
-                    log(f"info", f"WAITING", hierarchy_level=2)
-                    time.sleep(1)
 
-                    log(f"info", f"Sending the message...", hierarchy_level=2)
-                    # TODO: Send the message
-                    log("success", "Message sent successfully", hierarchy_level=2)
+                    # Wait for brief moment before sending to ensure full reliability
+                    log(f"info", f"WAITING", hierarchy_level=3)
+                    time.sleep(0.4)
 
-            time.sleep(1)
+                    log(f"info", f"Sending the message...", hierarchy_level=3)
+                    # Get send button element
+                    send_button = wait.until(EC.presence_of_element_located(("xpath", "/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button")))
+                    wait.until(EC.element_to_be_clickable(send_button))
+                    # send the message
+                    send_button.click()
+                    log("success", "Message sent successfully", hierarchy_level=3)
 
+            # Delay for x seconds before moving on to next person
+            time.sleep(0.5)
 
 
 def main() -> None:
@@ -248,8 +256,12 @@ def main() -> None:
     messages = [msg.strip() for msg in messages]
 
     # Initialize the driver
-    driver = webdriver.Chrome(ChromeDriverManager().install())
+    log("info", "Initializing web driver...")
+    log("info", "Installing the web driver...")
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    log("success", "Successfully initialized web driver!")
 
+    # Start the bot
     start_bot(names, messages, driver)
 
 
@@ -259,18 +271,3 @@ def main() -> None:
 if __name__ == "__main__":
     # Run main function
     main()
-
-    ###########
-    # TESTING #
-    ###########
-
-    # Logger
-    # log("info", "Level 0")
-    # log("info", "Level 1", hierarchy_level=1)
-    # log("info", "Level 1.1", hierarchy_level=1)
-    # log("info", "Level 2", hierarchy_level=2)
-    # log("info", "Level 2.1", hierarchy_level=2)
-    # log("success", "Level 3", hierarchy_level=3)
-    # log("info", "Level 1.2", hierarchy_level=2)
-    # log("info", "Level 1.3", hierarchy_level=1)
-    # log("success", "Level 0")
