@@ -168,10 +168,10 @@ def start_bot(names: list, messages: list, driver: any) -> None:
 
                 log(f"info", f"Sending the message...", hierarchy_level=4)
                 # Get send button element
-                # send_button = wait.until(EC.presence_of_element_located(("xpath", "/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button")))
-                # wait.until(EC.element_to_be_clickable(send_button))
+                send_button = wait.until(EC.presence_of_element_located(("xpath", "/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button")))
+                wait.until(EC.element_to_be_clickable(send_button))
                 # send the message
-                # send_button.click()
+                send_button.click()
                 log("success", "Message sent successfully", hierarchy_level=4)
 
             # Remove the current name from the list
