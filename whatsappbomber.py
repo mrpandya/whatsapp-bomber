@@ -320,7 +320,20 @@ def main() -> None:
 
     # Check what browser user wished and initialize driver accordingly
     if browser.startswith("ch"):
-        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+        try:
+            driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+        except Exception as e:
+            log("error", "Unable to automatically install chromedriver!\nTrying manual mode instead...")
+            try:
+                # Use chromedriver, assuming it is in same path
+                path = os.path.abspath("./chromedriver" if OS.lower().startswith("lin") else "chromedriver.exe")
+                service = webdriver.Chrome(executable_path=path)
+                driver = webdriver.Chrome(service=service)
+            except Exception as e:
+                log("error", "Unable to get chromedriver manually!")
+                log("info", "Quitting...")
+                log("error",e)
+                sys.exit()
     elif browser.startswith("fir"):
         try:
             driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
@@ -328,7 +341,7 @@ def main() -> None:
             log("error", "Unable to automatically install geckodriver!\nTrying manual mode instead...")
             try:
                 # Use geckodriver, assuming it is in same path
-                path = "./geckodriver" if OS.lower().startswith("lin") else "geckodriver.exe"
+                path = os.path.abspath("./geckodriver" if OS.lower().startswith("lin") else "geckodriver.exe")
                 service = FirefoxService(executable_path=path)
                 driver = webdriver.Firefox(service=service)
             except Exception as e:
@@ -336,7 +349,7 @@ def main() -> None:
                 log("info", "Quitting...")
                 sys.exit()
     else:
-        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+        log("error", "Browser is not compatible!!")
 
     log("success", "Successfully initialized web driver!")
 
