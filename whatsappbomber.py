@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 import time
@@ -15,6 +16,7 @@ import os
 import platform
 from colorama import Fore, init as colorama_init
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 
 ###########################
 # LIBRARY INITIALIZATIONS #
@@ -135,49 +137,137 @@ def start_bot(names: list, messages: list, driver: any) -> None:
 
     log("success", "Found chat list!")
 
-    # TODO: Scroll through contacts
-
-    print(f"{chat_list}\n{len(chat_list)}")
-
     # make all names lower case
     names = [name.lower() for name in names]
 
     log("info", "Iterating over list...")
     for i, contact in enumerate(chat_list):
-        log("info", f" ITERATION#{i+1} ")
+        log("info", f" ITERATION#{i+1}", hierarchy_level=1)
 
         contact_name = contact.find_element(By.CSS_SELECTOR, "div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1) > span").text
-        log(f"info", f"Name: {contact_name.title()}", hierarchy_level=1)
+        log(f"info", f"Name: {contact_name.title()}", hierarchy_level=2)
 
-        if i >= 0:
-            if contact_name.lower() in names:
-                log("info", "Clicking on contact...", hierarchy_level=1)
-                contact.click()
+        # if i >= 0:
+        if contact_name.lower() in names:
+            log("info", "Clicking on contact...", hierarchy_level=2)
+            contact.click()
 
-                log("info", "Clicking on text box", hierarchy_level=1)
-                text_box = wait.until(EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]")))
-                text_box.click()
+            log("info", "Clicking on text box", hierarchy_level=2)
+            text_box = wait.until(EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]")))
+            text_box.click()
 
-                # Loop through messages list and send them one by one
-                log("info", "Sending messages", hierarchy_level=1)
-                for message in messages:
-                    log(f"info", f"Writing: {message}", hierarchy_level=2)
-                    text_box.send_keys(message)
+            # Loop through messages list and send them one by one
+            log("info", "Sending messages", hierarchy_level=2)
+            for message in messages:
+                log(f"info", f"Writing: {message}", hierarchy_level=3)
+                text_box.send_keys(message)
 
-                    # Wait for brief moment before sending to ensure full reliability
-                    log(f"info", f"WAITING", hierarchy_level=3)
-                    time.sleep(0.4)
+                # Wait for brief moment before sending to ensure full reliability
+                log(f"info", f"WAITING", hierarchy_level=4)
+                time.sleep(0.4)
 
-                    log(f"info", f"Sending the message...", hierarchy_level=3)
-                    # Get send button element
-                    send_button = wait.until(EC.presence_of_element_located(("xpath", "/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button")))
-                    wait.until(EC.element_to_be_clickable(send_button))
-                    # send the message
-                    send_button.click()
-                    log("success", "Message sent successfully", hierarchy_level=3)
+                log(f"info", f"Sending the message...", hierarchy_level=4)
+                # Get send button element
+                send_button = wait.until(EC.presence_of_element_located(("xpath", "/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button")))
+                wait.until(EC.element_to_be_clickable(send_button))
+                # send the message
+                send_button.click()
+                log("success", "Message sent successfully", hierarchy_level=4)
+
+            # Remove the current name from the list
+            names.remove(contact_name.lower())
 
             # Delay for x seconds before moving on to next person
             time.sleep(0.5)
+
+    # Check if there are still contacts in the list
+    if len(names) > 0:
+        log("error", f"need to send messages to: {names}")
+        log("info", "Using other method for remaining people...")
+
+        # Get the search box
+        log("info", "Getting search box...")
+        search_box = wait.until(EC.presence_of_element_located(
+            (By.XPATH, "/html/body/div[1]/div/div/div[3]/div/div[1]/div/div/div[2]/div/div[2]")))
+        log("success", "Successfully got search box!")
+
+        log('info', "Iterating over remaining contacts...")
+        # Loop through remaining contact names
+        names = [name.lower() for name in names]
+
+        for i, name in enumerate(names):
+            log("info", f"Remaining Contact#{i+1}: {name}", hierarchy_level=1)
+
+            # Clear search box text
+            log("info", "Clearing search text...", hierarchy_level=2)
+
+            # Click on search box three times to select all text
+            search_box.click()
+            search_box.clear()
+
+            log("success", "Search text clear!", hierarchy_level=2)
+
+            # Type the name in the search box
+            log("info", f"Typing '{name.title()}' in the search box...", hierarchy_level=2)
+            search_box.send_keys(name)
+
+            # Search
+            log("info", f"Searching...", hierarchy_level=2)
+            search_box.send_keys(Keys.ENTER)
+
+            # Pause for everything to load
+            log("info", "WAITING", hierarchy_level=2)
+            time.sleep(1)
+            log("success", "Search successful!", hierarchy_level=2)
+
+            # If no contact name appears, print error and go to next iteration
+            try:
+                if driver.find_element(By.XPATH, "/html/body/div[1]/div/div/div[3]/div/div[2]/div[1]/div/span").text == "No chats, contacts or messages found":
+                    log("error", f"Contact(Name: {name}) was not found!", hierarchy_level=2)
+                    if not i == len(names) - 1:
+                        log("info", "Skipping to next iteration!", hierarchy_level=2)
+                    time.sleep(0.5)
+                    # Skip to next iteration
+                    continue
+            except Exception as e:
+                pass
+
+            # Get results
+            search_results_container = wait.until(
+                EC.presence_of_element_located((By.XPATH, '//*[@id="pane-side"]')))
+            search_results = search_results_container.find_elements(by=By.XPATH, value="./child::*")
+
+            print(f"SEARCH RESULTS: {search_results}\nLENGTH: {len(search_results)}")
+
+            # Pressing enter automatically selects first contact, so no need to reselect it
+            log("success", "Contact selected successfully!", hierarchy_level=3)
+
+            # Send messages to that contact
+            log("info", "Clicking on text box", hierarchy_level=3)
+            text_box = wait.until(EC.presence_of_element_located((By.XPATH,
+                                                                  "/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[1]")))
+            text_box.click()
+
+            log("info", "Sending messages", hierarchy_level=3)
+            for message in messages:
+                log(f"info", f"Writing: {message}", hierarchy_level=4)
+                text_box.send_keys(message)
+
+                # Wait for brief moment before sending to ensure full reliability
+                log(f"info", f"WAITING", hierarchy_level=5)
+                time.sleep(0.4)
+
+                log(f"info", f"Sending the message...", hierarchy_level=5)
+                # Get send button element
+                send_button = wait.until(EC.presence_of_element_located(("xpath", "/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[2]/button")))
+                wait.until(EC.element_to_be_clickable(send_button))
+                # send the message
+                send_button.click()
+                log("success", "Message sent successfully", hierarchy_level=5)
+
+            # Sleep for brief moment
+            log("info", "WAITING", hierarchy_level=2)
+            time.sleep(0.7)
 
 
 def main() -> None:
@@ -198,6 +288,7 @@ def main() -> None:
     names = get_input(f"Enter the contact/group names separated by a comma(,)")
     messages = get_input("Enter the message(s) that you want to send separated by a comma(,)")
     enable_logs = get_input("Enable logs to view progress of the bot? [ True/False ]").lower()
+    browser = get_input("Which browser to use?/What browser do you have installed? [ Chrome/FireFox ]").lower()
 
     # Convert enable logs to boolean
     if enable_logs.startswith("t") or enable_logs == "1":
@@ -207,7 +298,7 @@ def main() -> None:
     else:
         enable_logs = True
 
-    clear_screen()
+    # clear_screen()
 
     # Convert names and messages to list if they are not singular
 
@@ -226,7 +317,27 @@ def main() -> None:
     # Initialize the driver
     log("info", "Initializing web driver...")
     log("info", "Installing the web driver...")
-    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
+    # Check what browser user wished and initialize driver accordingly
+    if browser.startswith("ch"):
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    elif browser.startswith("fir"):
+        try:
+            driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+        except Exception as e:
+            log("error", "Unable to automatically install geckodriver!\nTrying manual mode instead...")
+            try:
+                # Use geckodriver, assuming it is in same path
+                path = "./geckodriver" if OS.lower().startswith("lin") else "geckodriver.exe"
+                service = FirefoxService(executable_path=path)
+                driver = webdriver.Firefox(service=service)
+            except Exception as e:
+                log("error", "Unable to get geckodriver manually!")
+                log("info", "Quitting...")
+                sys.exit()
+    else:
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
     log("success", "Successfully initialized web driver!")
 
     # Start the bot
