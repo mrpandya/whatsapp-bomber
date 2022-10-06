@@ -296,6 +296,15 @@ def start_bot(names: list, messages: list, driver: any) -> None:
     pretty_print("")
 
 
+def start_bot_https(names: list, messages: list) -> None:
+    print_title()
+
+    pretty_print(f"{Fore.YELLOW}To be developed ( issue#19 and issue#2 )", back_separator=False, front_separator=False)
+
+    pretty_print(f"{Fore.YELLOW}Press ENTER to return", align="left")
+    input()
+
+
 def main() -> None:
     # Global vars
     global enable_logs
@@ -312,7 +321,6 @@ def main() -> None:
     names = pretty_input(f"{Fore.BLUE}Enter the contact/group names separated by a comma(,)")
     messages = pretty_input(f"{Fore.BLUE}Enter the message(s) that you want to send separated by a comma(,)")
     enable_logs = pretty_input(f"{Fore.BLUE}Enable logs to view progress of the bot? [ True/False ]").lower()
-    browser = pretty_input(f"{Fore.BLUE}Which browser to use?/What browser do you have installed? [ Chrome/FireFox ]").lower()
 
     # Convert enable logs to boolean
     if enable_logs.startswith("t") or enable_logs == "1":
@@ -322,7 +330,14 @@ def main() -> None:
     else:
         enable_logs = True
 
-    clear_screen()
+    # Ask if use http requests or selenium
+    method = pretty_input(f"{Fore.BLUE}What should the bot use? [ Selenium/HTTP Requests ]").lower()
+
+    if method.startswith("h"):
+        clear_screen()
+        start_bot_https(names, messages)
+        clear_screen()
+        return
 
     # Convert names and messages to list if they are not singular
 
@@ -337,6 +352,10 @@ def main() -> None:
     # Remove unnecessary spaces from names list and messages list
     names = [name.strip() for name in names]
     messages = [msg.strip() for msg in messages]
+
+    browser = pretty_input(f"{Fore.BLUE}Which browser to use?/What browser do you have installed? [ Chrome/FireFox ]").lower()
+
+    clear_screen()
 
     # Initialize the driver
     log("info", "Initializing web driver...")
@@ -571,7 +590,18 @@ def print_title() -> None:
 
 
 def customizations_menu() -> None:
-    pass
+    clear_screen()
+
+    # Print title
+    print_title()
+
+    # TBD (ISSUE#18)
+    pretty_print(f"{Fore.RED}To be developed (issue#18)", back_separator=False)
+
+    pretty_print(f"{Fore.YELLOW}Press ENTER to return!", front_separator=False, back_separator=False)
+    pretty_input("")
+
+    clear_screen()
 
 
 def credits_menu() -> None:
