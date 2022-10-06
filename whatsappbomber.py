@@ -3,6 +3,7 @@
 #############
 import sys
 
+import colorama
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC 
@@ -35,6 +36,10 @@ URL = "https://web.whatsapp.com/"
 
 OS = platform.system()
 
+TERMINAL_SIZE = os.get_terminal_size()
+
+VERSION = "0.6.1"
+
 # Utility colors
 COLOR_COLON = Fore.CYAN
 COLOR_LINE_SEPARATOR = Fore.MAGENTA
@@ -45,6 +50,22 @@ COLOR_LOG_INFO = Fore.YELLOW
 COLOR_LOG_ERROR = Fore.RED
 COLOR_LOG_SUCCESS = Fore.GREEN
 COLOR_INPUT_DELIMITER = Fore.LIGHTBLUE_EX
+
+# APP TITLE COLORS
+APP_VERSION_COLOR = Fore.YELLOW
+
+APP_INPUT_COLOR = Fore.LIGHTYELLOW_EX
+APP_INPUT_SEPARATOR_COLOR = Fore.BLUE
+
+# MAIN MENU COLORS
+MAIN_MENU_TITLE_COLOR = Fore.BLUE
+
+MAIN_MENU_OPTIONS_NUMBER_COLOR = Fore.LIGHTBLUE_EX
+MAIN_MENU_OPTIONS_TEXT_COLOR = Fore.LIGHTMAGENTA_EX
+
+MAIN_MENU_DISCLAIMER_WARNING_COLOR = Fore.RED
+
+MAIN_MENU_EXIT_MESSAGE_COLOR = Fore.YELLOW
 
 # Webdriver
 WEBDRIVER_WAIT_TIMEOUT = 60
@@ -91,10 +112,10 @@ def log(level: str, message: str, hierarchy_level=0) -> None:
             # If first time printing message
             if i == 0:
                 # print the message with the level
-                print(f"{hierarchy_space}{color}[ {level.upper()} ] {msg.title()}")
+                pretty_print(f"{hierarchy_space}{color}[ {level.upper()} ] {msg.title()}", align="left", back_separator=False, front_separator=False)
             else:
                 # ignore the level and print the message only
-                print(f" " * new_line_length + f"{hierarchy_space}" + f"{Fore.YELLOW} {msg.title()}")
+                pretty_print(f" " * new_line_length + f"{hierarchy_space}" + f"{Fore.YELLOW} {msg.title()}")
 
 
 def clear_screen() -> None:
@@ -105,7 +126,9 @@ def clear_screen() -> None:
 
 
 def separate_line() -> None:
-    print(f"{COLOR_LINE_SEPARATOR}------------------------------")
+    columns = os.get_terminal_size().columns
+
+    print(f"{Fore.CYAN}| {COLOR_LINE_SEPARATOR}{'-' * (columns-4)} {Fore.CYAN}|")
 
 
 def start_bot(names: list, messages: list, driver: any) -> None:
@@ -269,6 +292,9 @@ def start_bot(names: list, messages: list, driver: any) -> None:
             log("info", "WAITING", hierarchy_level=2)
             time.sleep(0.7)
 
+    pretty_print(f"{Fore.YELLOW}Press {Fore.CYAN}ENTER to exit!", align="left", back_separator=False, front_separator=False)
+    pretty_print("")
+
 
 def main() -> None:
     # Global vars
@@ -277,18 +303,16 @@ def main() -> None:
     # Clearing the screen before running
     clear_screen()
 
-    # Logo
-    separate_line()
-    print(f"{COLOR_TITLE}W H A T S A P P    B O M B E R")
-    separate_line()
+    # Print title
+    print_title()
 
     # Get required data
 
     # Get names of contacts/groups to send the message to
-    names = get_input(f"Enter the contact/group names separated by a comma(,)")
-    messages = get_input("Enter the message(s) that you want to send separated by a comma(,)")
-    enable_logs = get_input("Enable logs to view progress of the bot? [ True/False ]").lower()
-    browser = get_input("Which browser to use?/What browser do you have installed? [ Chrome/FireFox ]").lower()
+    names = pretty_input(f"{Fore.BLUE}Enter the contact/group names separated by a comma(,)")
+    messages = pretty_input(f"{Fore.BLUE}Enter the message(s) that you want to send separated by a comma(,)")
+    enable_logs = pretty_input(f"{Fore.BLUE}Enable logs to view progress of the bot? [ True/False ]").lower()
+    browser = pretty_input(f"{Fore.BLUE}Which browser to use?/What browser do you have installed? [ Chrome/FireFox ]").lower()
 
     # Convert enable logs to boolean
     if enable_logs.startswith("t") or enable_logs == "1":
@@ -344,9 +368,497 @@ def main() -> None:
     start_bot(names, messages, driver)
 
 
+def check_color_string_in_dict(string: str, dictionary: dict, pattern_look_len: int) -> (bool, int):
+    count = 0
+    for index, char in enumerate(string):
+        if char == "\x1b":
+            full_pattern = string[index: index+pattern_look_len]
+
+            if full_pattern in dictionary.values():
+                count += 1
+
+    if count == 0:
+        return False, count
+    else:
+        return True, count
+
+
+def pretty_input(prompt: str):
+    if not prompt.strip() == "":
+        pretty_print(prompt, align="left", back_separator=False, front_separator=False)
+    user_input = input(f"{Fore.CYAN}| {APP_INPUT_SEPARATOR_COLOR}-> {APP_INPUT_COLOR}").lower()
+    separate_line()
+    return user_input
+
+def pretty_print(text: str, align="center", blank_character=" ", back_separator=True, front_separator=True) -> None:
+    # Local Variables
+    # align = align.lower()
+    #
+    # original_text = text
+    #
+    # # Delete color information in the text
+    # for color in Fore.__dict__:
+    #     text = text.replace(Fore.__dict__[color], "")
+    #
+    # length_of_text = len(text)
+    # terminal_size_h = TERMINAL_SIZE.columns
+    #
+    # # If length of text is making lines overflow, make text print in parts using buffer
+    # text_buffer = list()
+    # original_text_buffer = list()
+    #
+    # new_text = str()
+    # available_chars_width = int((terminal_size_h - 4))
+    # current_pos = 0
+    # if length_of_text >= available_chars_width:
+    #     # Update buffer for text(without color)
+    #     for index, char in enumerate(text):
+    #         current_pos += 1
+    #
+    #         new_text += char
+    #
+    #         if current_pos >= available_chars_width:
+    #             text_buffer.append(new_text)
+    #             new_text = str()
+    #             current_pos = 0
+    #
+    #         # If end of text
+    #         if index+1 >= length_of_text:
+    #             text_buffer.append(new_text)
+    #             new_text = str()
+    #             current_pos = 0
+    #
+    #     # Update original text buffer
+    #     current_pos = 0
+    #     for index, char in enumerate(original_text):
+    #         current_pos += 1
+    #
+    #         new_text += char
+    #
+    #         if current_pos >= available_chars_width:
+    #             original_text_buffer.append(new_text)
+    #             print(new_text)
+    #             new_text = str()
+    #             current_pos = 0
+    #
+    #         # If end of text
+    #         if index+1 >= len(original_text):
+    #             original_text_buffer.append(new_text)
+    #             new_text = str()
+    #             current_pos = 0
+    # else:
+    #     text_buffer.append(text)
+    #     original_text_buffer.append(original_text)
+    #
+    # # Loop through text buffer and renew the values to the finalized text
+    # for t in text_buffer:
+    #     length_of_text = len(t)
+    #     # Calculate the amount of space, taking alignment into consideration
+    #     if align == "center":
+    #         # Amount of space is the half of the screen width - the length of the side separators - the half of the text length
+    #         amount_of_space = int((terminal_size_h - 2)/2 - length_of_text/2)
+    #
+    #         # Make spacing variables
+    #         space_left = blank_character * amount_of_space
+    #         space_right = blank_character * amount_of_space
+    #     elif align == "right":
+    #         # Amount of space is the screen width - the side separator's length - the text length
+    #         amount_of_space = int((terminal_size_h - 2) - length_of_text)
+    #
+    #         space_left = blank_character * (amount_of_space - 1)
+    #         space_right = " "
+    #     elif align == "left":
+    #         # Amount of space is the screen width - the side separator's length - the text length
+    #         amount_of_space = int((terminal_size_h - 2) - length_of_text)
+    #
+    #         space_left = " "
+    #         space_right = blank_character * (amount_of_space - 1)
+    #
+    #     if not len(space_left) + len(space_right) + length_of_text == terminal_size_h:
+    #         if align == "center":
+    #             space_right = space_right + blank_character * ((terminal_size_h - 2) - (len(space_left) + len(space_right) + length_of_text))
+    #         elif align == "right":
+    #             space_left = space_left + blank_character * ((terminal_size_h - 2) - (len(space_left) + len(space_right) + length_of_text))
+    #         elif align == "left":
+    #             space_right = space_right + blank_character * ((terminal_size_h - 2) - (len(space_left) + len(space_right) + length_of_text))
+    #
+    #     result = f"{Fore.CYAN}|{Fore.RESET}" + space_left + t + space_right + f"{Fore.CYAN}|"
+    #
+    #     text_buffer[text_buffer.index(t)] = result
+    #
+    # if back_separator:
+    #     separate_line()
+    # # print(result)
+    # # Loop through buffer and print the text
+    # for msg in text_buffer:
+    #     print(msg)
+    # if front_separator:
+    #     separate_line()
+
+    # Local variables
+    align = align.lower()
+
+    colored_text = text
+
+    for color in Fore.__dict__:
+        text = text.replace(Fore.__dict__[color], "")
+
+    uncolored_text = text
+
+    # Get updated terminal size
+    terminal_size_h = os.get_terminal_size().columns
+
+    # Lengths
+    colored_text_length = len(colored_text)
+    uncolored_text_length = len(uncolored_text)
+
+    # Buffers
+    uncolored_text_buffer = list()
+    colored_text_insertion_buffer = list()
+    finalized_text_buffer = list()
+
+    # print(f"TERMINAL CHAR WIDTH: {terminal_size_h}")
+    # print(f"COLORED: {colored_text_length}")
+    # print(f"  - {colored_text}")
+    # print(f"UNCOLORED: {uncolored_text_length}")
+    # print(f"  - {uncolored_text}")
+
+    # Calculating buffers
+    available_char_space = terminal_size_h - 4
+    if len(uncolored_text) >= available_char_space:
+        # Variables for calculation
+        position_counter = 0
+        last_position = position_counter
+        current_text_buffer = str()
+
+        # Calculate uncolored buffer
+        for index, unc_char in enumerate(uncolored_text):
+            position_counter = (index + 1) - last_position
+
+            # Add the character to the current text buffer
+            current_text_buffer += unc_char
+
+            # Check if position counter is greater than available space
+            if position_counter >= available_char_space:
+                # Add the character in the current_text_buffer to the uncolored buffer
+                uncolored_text_buffer.append(current_text_buffer)
+
+                # Set last position to current
+                last_position = position_counter + last_position
+
+                # Reset the position counter
+                position_counter = 0
+
+                # Reset current text buffer
+                current_text_buffer = ""
+
+            # Check if position counter(+ last position to make it current) is last character
+            if position_counter + last_position >= uncolored_text_length:
+                # Add the character in the current_text_buffer to the uncolored buffer
+                uncolored_text_buffer.append(current_text_buffer)
+
+                # Set last position to 0 because end of loop
+                last_position = 0
+
+                # Reset the position counter
+                position_counter = 0
+
+                # Reset current text buffer
+                current_text_buffer = ""
+
+        color_code_chars_length = 5
+        without_color_index = 0
+        # Calculate color insertion buffer
+        for index, c_char in enumerate(colored_text):
+            if c_char == "\x1b":
+                # print(f"HERE [INDEX: {index} - {index+color_code_chars_length}] [ REMOVED COLOR CODES INDEX: {without_color_index} - {without_color_index+color_code_chars_length} ]")
+                if not without_color_index - color_code_chars_length <= 0:
+                    without_color_index -= color_code_chars_length
+
+                colored_text_insertion_buffer.append(((without_color_index, without_color_index+color_code_chars_length), c_char + colored_text[index+1:index+color_code_chars_length]))
+
+                without_color_index += 1
+                continue
+
+            without_color_index += 1
+
+            # print(c_char)
+    else:
+        uncolored_text_buffer.append(uncolored_text)
+        colored_text_insertion_buffer.append(colored_text)
+
+        finalized_text_buffer.append(colored_text)
+
+    # print(f"UNCOLORED_BUFFER: {uncolored_text_buffer}")
+    # print(f"    - LENGTH: {len(uncolored_text_buffer)}")
+    # print(f"COLOR_INSERTION_BUFFER: {colored_text_insertion_buffer}")
+    # print(f"    - LENGTH: {len(colored_text_insertion_buffer)}")
+
+    # separate_line()
+    # print(f"COLOR INSERTION BUFFER: {colored_text_insertion_buffer}")
+
+    # TODO: Loop through uncolored text buffer and do alignment stuff and insert color at index x using color insertion buffer
+    if len(uncolored_text) >= available_char_space:
+
+        last_color = ""
+        for unc_text in uncolored_text_buffer:
+            res = ""
+            skip_parent_iteration = False
+            last_index = 0
+            for index, char in enumerate(unc_text):
+                if len(colored_text_insertion_buffer) > 0:
+                    for color_insertion in colored_text_insertion_buffer:
+                        i = color_insertion[0][0]
+                        v = color_insertion[1]
+
+                        # print(f"Insert at index {i} with value {v}[ TEST ]")
+
+                        if index == i:
+                            # print(f"Insert at {i} with {v}COLOR-HERE")
+                            res += v + char
+                            last_color = v
+                            colored_text_insertion_buffer.remove(color_insertion)
+                            # print(f"LAST COLOR: {last_color}T")
+                            skip_parent_iteration = True
+
+                        # print(colored_text_insertion_buffer)
+                        # time.sleep(1)
+
+                if skip_parent_iteration:
+                    skip_parent_iteration = False
+                    continue
+
+                res += char
+
+            if not index == last_index:
+                # print(f"BEFORE: {res}")
+                res = last_color + res
+                # print(f"AFTER: {res}")
+                last_index = index
+                # print(f"Here | {last_color}T")
+
+            finalized_text_buffer.append(res)
+
+            # time.sleep(1)
+            # print(f"[ STATUS ] FINALIZED TEXT BUFFER: {finalized_text_buffer}")
+
+    # separate_line()
+    # print(f"{last_color}[ COLOR ]")
+    # print(f"FINALIZED TEXT BUFFER: {finalized_text_buffer}")
+    # sys.exit()
+
+    # separate_line()
+    # separate_line()
+    # separate_line()
+    # print(uncolored_text_buffer)
+    # print(colored_text_insertion_buffer)
+    # print(f"Length of color insertion buffer: {len(colored_text_insertion_buffer)}")
+    # separate_line()
+    # print(finalized_text_buffer)
+    # separate_line()
+    # sys.exit()
+
+    # TODO: alignment
+    for ftext in finalized_text_buffer:
+        # print(f"TEXT: {ftext}")
+        # print(f"CLEN: {len(ftext)}")
+        if len(ftext) > 5:
+            is_color, color_count = check_color_string_in_dict(ftext, Fore.__dict__, 5)
+            if is_color:
+                length_of_text = int(len(ftext) - (color_count * 5))
+            else:
+                length_of_text = len(ftext)
+        else:
+            length_of_text = len(ftext)
+        # print(f"LENG: {'-' * length_of_text}")
+        # print(f"UCLE: {length_of_text}")
+
+        # Calculate the amount of space, taking alignment into consideration
+        if align == "center":
+            # Amount of space is the half of the screen width - the length of the side separators - the half of the text length
+            amount_of_space = int((terminal_size_h - 2)/2 - length_of_text/2)
+
+            # Make spacing variables
+            space_left = blank_character * amount_of_space
+            space_right = blank_character * amount_of_space
+        elif align == "right":
+            # Amount of space is the screen width - the side separator's length - the text length
+            amount_of_space = int((terminal_size_h - 2) - length_of_text)
+
+            space_left = blank_character * (amount_of_space - 1)
+            space_right = " "
+        elif align == "left":
+            # Amount of space is the screen width - the side separator's length - the text length
+            amount_of_space = int((terminal_size_h - 2) - length_of_text)
+
+            space_left = " "
+            space_right = blank_character * (amount_of_space - 1)
+
+        if len(space_left) + len(space_right) + length_of_text <= terminal_size_h:
+            if align == "center":
+                space_right = space_right + blank_character * ((terminal_size_h - 2) - (len(space_left) + len(space_right) + length_of_text))
+            elif align == "right":
+                space_left = space_left + blank_character * ((terminal_size_h - 2) - (len(space_left) + len(space_right) + length_of_text))
+            elif align == "left":
+                space_right = space_right + blank_character * ((terminal_size_h - 2) - (len(space_left) + len(space_right) + length_of_text))
+
+        result = f"{Fore.CYAN}|{Fore.RESET}" + space_left + ftext + space_right + f"{Fore.CYAN}|"
+
+        finalized_text_buffer[finalized_text_buffer.index(ftext)] = result
+
+
+    if back_separator:
+        separate_line()
+
+    # Print text in finalized text buffer
+    for msg in finalized_text_buffer:
+        print(msg)
+
+    if front_separator:
+        separate_line()
+
+    # print(finalized_text_buffer)
+
+def print_title() -> None:
+    # Print version and logo/name
+    pretty_print(f"{Fore.GREEN}W H A T S {Fore.LIGHTGREEN_EX}A P P  {Fore.LIGHTMAGENTA_EX}B {Fore.LIGHTYELLOW_EX}O M B {Fore.GREEN}E R", align="center", front_separator=False)
+    pretty_print(f"{APP_VERSION_COLOR}version {VERSION}", align="center", back_separator=False)
+
+
+def customizations_menu() -> None:
+    pass
+
+
+def credits_menu() -> None:
+    clear_screen()
+
+    contributors = ["IamMU", "pathikg", "rushabhgandhi13", "b-Istiak-s"]
+
+    # Print credits
+    pretty_print(f"{Fore.YELLOW}INFORMATION", align="center")
+    pretty_print(f"Whatsapp Bomber is an open-source project made to automate whatsapp messages so you can prioritize tasks, other than managing whatsapp groups.",
+                 back_separator=False, align="center")
+    pretty_print(f"{Fore.YELLOW}AUTHOR/OWNER", align="center", back_separator=False)
+    pretty_print(f"Manan Pandya[ https://github.com/mrpandya ]", align="center", back_separator=False)
+    pretty_print(f"{Fore.YELLOW}CONTRIBUTORS", align="center", back_separator=False)
+
+    for contributor in contributors:
+        pretty_print(f"{contributor} [ https://github.com/{contributor} ]", align="center", back_separator=False, front_separator=False)
+
+    separate_line()
+    input(f"{Fore.CYAN}| {APP_INPUT_COLOR}Press ENTER to return")
+
+
+def main_menu() -> None:
+    clear_screen()
+
+    user_input = str()
+
+    possible_quit_commands = ["exit", "quit", "q", "end", "4", "e"]
+
+    options = ["1", "2", "3", "4", "start bot", "customizations", "credits"]
+
+    error_messages = []
+
+    while not user_input in possible_quit_commands:
+        print_title()
+
+        # Print Main Menu Options
+        pretty_print(f"{MAIN_MENU_TITLE_COLOR}Main Menu", align="center", back_separator=False)
+        pretty_print(f"{MAIN_MENU_OPTIONS_NUMBER_COLOR}1) {MAIN_MENU_OPTIONS_TEXT_COLOR}Start Bot", align="center", back_separator=False, front_separator=False)
+        pretty_print(f"{MAIN_MENU_OPTIONS_NUMBER_COLOR}2) {MAIN_MENU_OPTIONS_TEXT_COLOR}Customizations/Settings", align="center", back_separator=False, front_separator=False)
+        pretty_print(f"{MAIN_MENU_OPTIONS_NUMBER_COLOR}3) {MAIN_MENU_OPTIONS_TEXT_COLOR}Credits", align="center", back_separator=False, front_separator=False)
+        pretty_print(f"{MAIN_MENU_OPTIONS_NUMBER_COLOR}4) {MAIN_MENU_OPTIONS_TEXT_COLOR}Exit", align="center", back_separator=False)
+
+        # Print Disclaimer
+        pretty_print(f"{MAIN_MENU_DISCLAIMER_WARNING_COLOR}DO NOT USE FOR SPAM OR ANY OTHER MALICIOUS USE", align="center", back_separator=False)
+
+        # Print all errors if any
+        lines_used = 15
+        if len(error_messages) > 0:
+            if len(error_messages) > TERMINAL_SIZE.lines - lines_used:
+                error_messages.pop(0)
+
+            for error in error_messages:
+                pretty_print("[ ERROR ] " + error, align="center", back_separator=False, front_separator=False)
+
+            separate_line()
+
+        # Print User Input Prompt
+        user_input = pretty_input("")
+
+        # TODO: Options
+        # TODO: Make pretty print print big text on different lines
+        if user_input in options:
+            if user_input.startswith("1") or user_input.startswith("s"):
+                main()
+            elif user_input.startswith("2") or user_input.startswith("cu"):
+                customizations_menu()
+            elif user_input.startswith("3") or user_input.startswith("cr"):
+                credits_menu()
+        else:
+            error_messages.append(f"{Fore.YELLOW}Please choose a correct option! {Fore.LIGHTYELLOW_EX}Your previous option '{user_input}' is not valid!")
+
+        # Clear the screen
+        clear_screen()
+
+    # Goodbye message
+    pretty_print(f"{MAIN_MENU_EXIT_MESSAGE_COLOR}Goodbye!")
+
+
 #####################
 # PROGRAM EXECUTION #
 #####################
 if __name__ == "__main__":
+    clear_screen()
     # Run main function
-    main()
+    # main()
+
+    main_menu()
+
+    ####################
+    # TESTS FOR LOGGER #
+    ####################
+    # pretty_print("-" * TERMINAL_SIZE.columns)
+    # pretty_print(f"{Fore.CYAN}" + "*" * int(TERMINAL_SIZE.columns/2))
+    # string = Fore.YELLOW + " ".join([str(i) for i in range(100)])
+    # pretty_print(string)
+    # pretty_print(f"{Fore.YELLOW}Alignment Tests", align="center")
+    # pretty_print("[ LEFT ]", align="left", back_separator=False, front_separator=False)
+    # pretty_print("[ RIGHT ]", align="right", back_separator=False, front_separator=False)
+    # pretty_print("[ CENTER ]", align="center", back_separator=False)
+    # pretty_print(f"{Fore.YELLOW}Longer Alignment Tests", back_separator=False)
+    # pretty_print("[ THIS TEXT IS ALIGNED TO THE LEFT ]", align="left", back_separator=False, front_separator=False)
+    # pretty_print("[ THIS TEXT IS ALIGNED TO THE RIGHT ]", align="right", back_separator=False, front_separator=False)
+    # pretty_print("[ THIS TEXT IS ALIGNED TO THE CENTER ]", align="center", back_separator=False)
+    # pretty_print(f"{Fore.YELLOW}Color Tests Without Alignment", align="center", back_separator=False)
+    # pretty_print(f"{Fore.GREEN}I am supposed to be green", back_separator=False, front_separator=False)
+    # pretty_print(f"{Fore.RED}I am supposed to be red", back_separator=False, front_separator=False)
+    # pretty_print(f"And I am supposed to be {Fore.GREEN}green {Fore.RESET}+ {Fore.RED}red", back_separator=False)
+    # pretty_print(f"{Fore.YELLOW}Color Tests With Alignment", align="center", back_separator=False)
+    # pretty_print(f"{Fore.CYAN}[ THIS IS ALIGNED TO LEFT ]", align="left", back_separator=False, front_separator=False)
+    # pretty_print(f"{Fore.MAGENTA}[ THIS IS ALIGNED TO RIGHT ]", align="right", back_separator=False, front_separator=False)
+    # pretty_print(f"{Fore.GREEN}[ THIS IS ALIGNED TO THE CENTER ]", align="center", back_separator=False)
+
+    # pretty_print(f"{Fore.YELLOW}[ TESTING ] {Fore.CYAN}This is some testing text!")
+    # # separate_line()
+    # pretty_print(f"{Fore.YELLOW}[ TESTING # 2 ] {Fore.CYAN}This is some testing text! This is some addition to the testing text!")
+    # # separate_line()
+    # pretty_print(f"{Fore.YELLOW}[ TESTING # 3 ] {Fore.CYAN}This is some testing text with an addition to the texting test with another addition to the testing text!")
+    # # separate_line()
+    # pretty_print(f"{Fore.YELLOW}[ TESTING # 4] {Fore.CYAN}This is some testing text with an addition to the texting test with another addition to the testing text! With MOAR TEXT, YEEEEEEEETT!!!!!")
+    # separate_line()
+    # #
+    # final_test_string = f"{Fore.GREEN}[ FINAL TEST # 0 ]{Fore.CYAN}"
+    # for i in range(100):
+    #     final_test_string += f" {i}"
+    #
+    # pretty_print(final_test_string, back_separator=False)
+
+    # separate_line()
+    # separate_line()
+    #
+    # pretty_print(f"{Fore.YELLOW}[ COLOR TEST # 1 ]{Fore.CYAN}CYAN {Fore.RED}RED {Fore.GREEN}GREEN {Fore.BLUE}B{Fore.MAGENTA}L{Fore.RED}-{Fore.LIGHTGREEN_EX}W{Fore.WHITE}H{Fore.LIGHTYELLOW_EX}A{Fore.CYAN}T ------------------------------------------------------------------------------------------------------------------------------------------------")
+    #
+    # pretty_print(
+    #     f"{Fore.YELLOW}[ COLOR TEST # 1 ]{Fore.CYAN}CYAN {Fore.RED}RED {Fore.GREEN}GREEN {Fore.BLUE}B{Fore.MAGENTA}L{Fore.RED}-{Fore.LIGHTGREEN_EX}W{Fore.WHITE}H{Fore.LIGHTYELLOW_EX}A{Fore.CYAN}T")
