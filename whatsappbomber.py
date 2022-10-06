@@ -38,7 +38,7 @@ OS = platform.system()
 
 TERMINAL_SIZE = os.get_terminal_size()
 
-VERSION = "0.6.1"
+VERSION = "0.6.8"
 
 # Utility colors
 COLOR_COLON = Fore.CYAN
@@ -322,7 +322,7 @@ def main() -> None:
     else:
         enable_logs = True
 
-    # clear_screen()
+    clear_screen()
 
     # Convert names and messages to list if they are not singular
 
@@ -390,112 +390,10 @@ def pretty_input(prompt: str):
     separate_line()
     return user_input
 
-def pretty_print(text: str, align="center", blank_character=" ", back_separator=True, front_separator=True) -> None:
-    # Local Variables
-    # align = align.lower()
-    #
-    # original_text = text
-    #
-    # # Delete color information in the text
-    # for color in Fore.__dict__:
-    #     text = text.replace(Fore.__dict__[color], "")
-    #
-    # length_of_text = len(text)
-    # terminal_size_h = TERMINAL_SIZE.columns
-    #
-    # # If length of text is making lines overflow, make text print in parts using buffer
-    # text_buffer = list()
-    # original_text_buffer = list()
-    #
-    # new_text = str()
-    # available_chars_width = int((terminal_size_h - 4))
-    # current_pos = 0
-    # if length_of_text >= available_chars_width:
-    #     # Update buffer for text(without color)
-    #     for index, char in enumerate(text):
-    #         current_pos += 1
-    #
-    #         new_text += char
-    #
-    #         if current_pos >= available_chars_width:
-    #             text_buffer.append(new_text)
-    #             new_text = str()
-    #             current_pos = 0
-    #
-    #         # If end of text
-    #         if index+1 >= length_of_text:
-    #             text_buffer.append(new_text)
-    #             new_text = str()
-    #             current_pos = 0
-    #
-    #     # Update original text buffer
-    #     current_pos = 0
-    #     for index, char in enumerate(original_text):
-    #         current_pos += 1
-    #
-    #         new_text += char
-    #
-    #         if current_pos >= available_chars_width:
-    #             original_text_buffer.append(new_text)
-    #             print(new_text)
-    #             new_text = str()
-    #             current_pos = 0
-    #
-    #         # If end of text
-    #         if index+1 >= len(original_text):
-    #             original_text_buffer.append(new_text)
-    #             new_text = str()
-    #             current_pos = 0
-    # else:
-    #     text_buffer.append(text)
-    #     original_text_buffer.append(original_text)
-    #
-    # # Loop through text buffer and renew the values to the finalized text
-    # for t in text_buffer:
-    #     length_of_text = len(t)
-    #     # Calculate the amount of space, taking alignment into consideration
-    #     if align == "center":
-    #         # Amount of space is the half of the screen width - the length of the side separators - the half of the text length
-    #         amount_of_space = int((terminal_size_h - 2)/2 - length_of_text/2)
-    #
-    #         # Make spacing variables
-    #         space_left = blank_character * amount_of_space
-    #         space_right = blank_character * amount_of_space
-    #     elif align == "right":
-    #         # Amount of space is the screen width - the side separator's length - the text length
-    #         amount_of_space = int((terminal_size_h - 2) - length_of_text)
-    #
-    #         space_left = blank_character * (amount_of_space - 1)
-    #         space_right = " "
-    #     elif align == "left":
-    #         # Amount of space is the screen width - the side separator's length - the text length
-    #         amount_of_space = int((terminal_size_h - 2) - length_of_text)
-    #
-    #         space_left = " "
-    #         space_right = blank_character * (amount_of_space - 1)
-    #
-    #     if not len(space_left) + len(space_right) + length_of_text == terminal_size_h:
-    #         if align == "center":
-    #             space_right = space_right + blank_character * ((terminal_size_h - 2) - (len(space_left) + len(space_right) + length_of_text))
-    #         elif align == "right":
-    #             space_left = space_left + blank_character * ((terminal_size_h - 2) - (len(space_left) + len(space_right) + length_of_text))
-    #         elif align == "left":
-    #             space_right = space_right + blank_character * ((terminal_size_h - 2) - (len(space_left) + len(space_right) + length_of_text))
-    #
-    #     result = f"{Fore.CYAN}|{Fore.RESET}" + space_left + t + space_right + f"{Fore.CYAN}|"
-    #
-    #     text_buffer[text_buffer.index(t)] = result
-    #
-    # if back_separator:
-    #     separate_line()
-    # # print(result)
-    # # Loop through buffer and print the text
-    # for msg in text_buffer:
-    #     print(msg)
-    # if front_separator:
-    #     separate_line()
 
-    # Local variables
+def pretty_print(text: str, align="center", blank_character=" ", back_separator=True, front_separator=True) -> None:
+    """Print function, with alignment and aesthetics - Made by IamMU with 💗 for Whatsapp Bomber in Hacktoberfest"""
+
     align = align.lower()
 
     colored_text = text
@@ -516,12 +414,6 @@ def pretty_print(text: str, align="center", blank_character=" ", back_separator=
     uncolored_text_buffer = list()
     colored_text_insertion_buffer = list()
     finalized_text_buffer = list()
-
-    # print(f"TERMINAL CHAR WIDTH: {terminal_size_h}")
-    # print(f"COLORED: {colored_text_length}")
-    # print(f"  - {colored_text}")
-    # print(f"UNCOLORED: {uncolored_text_length}")
-    # print(f"  - {uncolored_text}")
 
     # Calculating buffers
     available_char_space = terminal_size_h - 4
@@ -571,7 +463,6 @@ def pretty_print(text: str, align="center", blank_character=" ", back_separator=
         # Calculate color insertion buffer
         for index, c_char in enumerate(colored_text):
             if c_char == "\x1b":
-                # print(f"HERE [INDEX: {index} - {index+color_code_chars_length}] [ REMOVED COLOR CODES INDEX: {without_color_index} - {without_color_index+color_code_chars_length} ]")
                 if not without_color_index - color_code_chars_length <= 0:
                     without_color_index -= color_code_chars_length
 
@@ -581,23 +472,12 @@ def pretty_print(text: str, align="center", blank_character=" ", back_separator=
                 continue
 
             without_color_index += 1
-
-            # print(c_char)
     else:
         uncolored_text_buffer.append(uncolored_text)
         colored_text_insertion_buffer.append(colored_text)
 
         finalized_text_buffer.append(colored_text)
 
-    # print(f"UNCOLORED_BUFFER: {uncolored_text_buffer}")
-    # print(f"    - LENGTH: {len(uncolored_text_buffer)}")
-    # print(f"COLOR_INSERTION_BUFFER: {colored_text_insertion_buffer}")
-    # print(f"    - LENGTH: {len(colored_text_insertion_buffer)}")
-
-    # separate_line()
-    # print(f"COLOR INSERTION BUFFER: {colored_text_insertion_buffer}")
-
-    # TODO: Loop through uncolored text buffer and do alignment stuff and insert color at index x using color insertion buffer
     if len(uncolored_text) >= available_char_space:
 
         last_color = ""
@@ -611,18 +491,11 @@ def pretty_print(text: str, align="center", blank_character=" ", back_separator=
                         i = color_insertion[0][0]
                         v = color_insertion[1]
 
-                        # print(f"Insert at index {i} with value {v}[ TEST ]")
-
                         if index == i:
-                            # print(f"Insert at {i} with {v}COLOR-HERE")
                             res += v + char
                             last_color = v
                             colored_text_insertion_buffer.remove(color_insertion)
-                            # print(f"LAST COLOR: {last_color}T")
                             skip_parent_iteration = True
-
-                        # print(colored_text_insertion_buffer)
-                        # time.sleep(1)
 
                 if skip_parent_iteration:
                     skip_parent_iteration = False
@@ -631,37 +504,12 @@ def pretty_print(text: str, align="center", blank_character=" ", back_separator=
                 res += char
 
             if not index == last_index:
-                # print(f"BEFORE: {res}")
                 res = last_color + res
-                # print(f"AFTER: {res}")
                 last_index = index
-                # print(f"Here | {last_color}T")
 
             finalized_text_buffer.append(res)
 
-            # time.sleep(1)
-            # print(f"[ STATUS ] FINALIZED TEXT BUFFER: {finalized_text_buffer}")
-
-    # separate_line()
-    # print(f"{last_color}[ COLOR ]")
-    # print(f"FINALIZED TEXT BUFFER: {finalized_text_buffer}")
-    # sys.exit()
-
-    # separate_line()
-    # separate_line()
-    # separate_line()
-    # print(uncolored_text_buffer)
-    # print(colored_text_insertion_buffer)
-    # print(f"Length of color insertion buffer: {len(colored_text_insertion_buffer)}")
-    # separate_line()
-    # print(finalized_text_buffer)
-    # separate_line()
-    # sys.exit()
-
-    # TODO: alignment
     for ftext in finalized_text_buffer:
-        # print(f"TEXT: {ftext}")
-        # print(f"CLEN: {len(ftext)}")
         if len(ftext) > 5:
             is_color, color_count = check_color_string_in_dict(ftext, Fore.__dict__, 5)
             if is_color:
@@ -670,8 +518,6 @@ def pretty_print(text: str, align="center", blank_character=" ", back_separator=
                 length_of_text = len(ftext)
         else:
             length_of_text = len(ftext)
-        # print(f"LENG: {'-' * length_of_text}")
-        # print(f"UCLE: {length_of_text}")
 
         # Calculate the amount of space, taking alignment into consideration
         if align == "center":
@@ -717,7 +563,6 @@ def pretty_print(text: str, align="center", blank_character=" ", back_separator=
     if front_separator:
         separate_line()
 
-    # print(finalized_text_buffer)
 
 def print_title() -> None:
     # Print version and logo/name
