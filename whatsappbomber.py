@@ -686,54 +686,6 @@ def main_menu() -> None:
 #####################
 if __name__ == "__main__":
     clear_screen()
-    # Run main function
-    # main()
 
     main_menu()
-
-    ####################
-    # TESTS FOR LOGGER #
-    ####################
-    # pretty_print("-" * TERMINAL_SIZE.columns)
-    # pretty_print(f"{Fore.CYAN}" + "*" * int(TERMINAL_SIZE.columns/2))
-    # string = Fore.YELLOW + " ".join([str(i) for i in range(100)])
-    # pretty_print(string)
-    # pretty_print(f"{Fore.YELLOW}Alignment Tests", align="center")
-    # pretty_print("[ LEFT ]", align="left", back_separator=False, front_separator=False)
-    # pretty_print("[ RIGHT ]", align="right", back_separator=False, front_separator=False)
-    # pretty_print("[ CENTER ]", align="center", back_separator=False)
-    # pretty_print(f"{Fore.YELLOW}Longer Alignment Tests", back_separator=False)
-    # pretty_print("[ THIS TEXT IS ALIGNED TO THE LEFT ]", align="left", back_separator=False, front_separator=False)
-    # pretty_print("[ THIS TEXT IS ALIGNED TO THE RIGHT ]", align="right", back_separator=False, front_separator=False)
-    # pretty_print("[ THIS TEXT IS ALIGNED TO THE CENTER ]", align="center", back_separator=False)
-    # pretty_print(f"{Fore.YELLOW}Color Tests Without Alignment", align="center", back_separator=False)
-    # pretty_print(f"{Fore.GREEN}I am supposed to be green", back_separator=False, front_separator=False)
-    # pretty_print(f"{Fore.RED}I am supposed to be red", back_separator=False, front_separator=False)
-    # pretty_print(f"And I am supposed to be {Fore.GREEN}green {Fore.RESET}+ {Fore.RED}red", back_separator=False)
-    # pretty_print(f"{Fore.YELLOW}Color Tests With Alignment", align="center", back_separator=False)
-    # pretty_print(f"{Fore.CYAN}[ THIS IS ALIGNED TO LEFT ]", align="left", back_separator=False, front_separator=False)
-    # pretty_print(f"{Fore.MAGENTA}[ THIS IS ALIGNED TO RIGHT ]", align="right", back_separator=False, front_separator=False)
-    # pretty_print(f"{Fore.GREEN}[ THIS IS ALIGNED TO THE CENTER ]", align="center", back_separator=False)
-
-    # pretty_print(f"{Fore.YELLOW}[ TESTING ] {Fore.CYAN}This is some testing text!")
-    # # separate_line()
-    # pretty_print(f"{Fore.YELLOW}[ TESTING # 2 ] {Fore.CYAN}This is some testing text! This is some addition to the testing text!")
-    # # separate_line()
-    # pretty_print(f"{Fore.YELLOW}[ TESTING # 3 ] {Fore.CYAN}This is some testing text with an addition to the texting test with another addition to the testing text!")
-    # # separate_line()
-    # pretty_print(f"{Fore.YELLOW}[ TESTING # 4] {Fore.CYAN}This is some testing text with an addition to the texting test with another addition to the testing text! With MOAR TEXT, YEEEEEEEETT!!!!!")
-    # separate_line()
-    # #
-    # final_test_string = f"{Fore.GREEN}[ FINAL TEST # 0 ]{Fore.CYAN}"
-    # for i in range(100):
-    #     final_test_string += f" {i}"
-    #
-    # pretty_print(final_test_string, back_separator=False)
-
-    # separate_line()
-    # separate_line()
-    #
-    # pretty_print(f"{Fore.YELLOW}[ COLOR TEST # 1 ]{Fore.CYAN}CYAN {Fore.RED}RED {Fore.GREEN}GREEN {Fore.BLUE}B{Fore.MAGENTA}L{Fore.RED}-{Fore.LIGHTGREEN_EX}W{Fore.WHITE}H{Fore.LIGHTYELLOW_EX}A{Fore.CYAN}T ------------------------------------------------------------------------------------------------------------------------------------------------")
-    #
-    # pretty_print(
-    #     f"{Fore.YELLOW}[ COLOR TEST # 1 ]{Fore.CYAN}CYAN {Fore.RED}RED {Fore.GREEN}GREEN {Fore.BLUE}B{Fore.MAGENTA}L{Fore.RED}-{Fore.LIGHTGREEN_EX}W{Fore.WHITE}H{Fore.LIGHTYELLOW_EX}A{Fore.CYAN}T")
+    
