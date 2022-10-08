@@ -1,7 +1,7 @@
 <h1 align="center">WHATSAPP BOMBER</h1>
 </br>
 <h4 align="center">A script to automate whatsapp message sending</h4>
-![Sample Image](Images/img.png)
+<img alt="Sample" src="/Images/img.png">
 
 ## How to setup
 
@@ -49,7 +49,7 @@ Extract it in a known location , as we need the location later (as mentioned in 
 <p>
   <h5>Step 5.1: If you chose selenium, choose a browser of your choice.</h5>
   <h6>You should have something that looks like this</h6>
-  ![Steps](Images/StepsFinal.png)
+  <img src="/Images/StepsFinal.png" alt="Steps">
 </p>
 <p>
   <h5>Step 5: Authorize whatsapp web</h5>
