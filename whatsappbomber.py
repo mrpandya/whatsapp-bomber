@@ -688,4 +688,3 @@ if __name__ == "__main__":
     clear_screen()
 
     main_menu()
-    
