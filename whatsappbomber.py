@@ -4,12 +4,15 @@
 import sys
 
 import colorama
+import shutil
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait 
-from selenium.webdriver.support import expected_conditions as EC 
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 import time
@@ -52,6 +55,8 @@ COLOR_LOG_SUCCESS = Fore.GREEN
 COLOR_INPUT_DELIMITER = Fore.LIGHTBLUE_EX
 
 # APP TITLE COLORS
+APP_DATA_PATH = "WhatsappBomberDataCache"
+
 APP_VERSION_COLOR = Fore.YELLOW
 
 APP_INPUT_COLOR = Fore.LIGHTYELLOW_EX
@@ -143,10 +148,14 @@ def start_bot(names: list, messages: list, driver: any) -> None:
     driver.get(URL)
     log("success", "Successfully opened whatsapp!")
 
-    # @Wait for person to verify the link
-    log("info", "Awaiting manual authentication...")
-    wait.until(EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div/div[3]/header/div[1]/div/img")))
-    log("success", "Authentication successful!")
+    # Check if data exists, if yes then skip verification else don't
+    if os.path.exists(APP_DATA_PATH):
+        pass
+    else:
+        # Wait for person to verify the link
+        log("info", "Awaiting manual authentication...")
+        wait.until(EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div/div/div[3]/header/div[1]/div/img")))
+        log("success", "Authentication successful!")
 
     # Pause for page to load and syncing
     log("info", "Waiting for synchronization and full page...")
@@ -162,6 +171,8 @@ def start_bot(names: list, messages: list, driver: any) -> None:
 
     # make all names lower case
     names = [name.lower() for name in names]
+
+    time.sleep(0.5)
 
     log("info", "Iterating over list...")
     for i, contact in enumerate(chat_list):
@@ -187,7 +198,7 @@ def start_bot(names: list, messages: list, driver: any) -> None:
 
                 # Wait for brief moment before sending to ensure full reliability
                 log(f"info", f"WAITING", hierarchy_level=4)
-                time.sleep(0.4)
+                time.sleep(0.5)
 
                 log(f"info", f"Sending the message...", hierarchy_level=4)
                 # Get send button element
@@ -344,14 +355,16 @@ def main() -> None:
     # Check if there are more names
     if "," in names:
         names = names.split(",")
+        names = [name.strip() for name in names]
+    else:
+        names = [names]
 
     # Check if there are more than one messages
     if "," in messages:
         messages = messages.split(",")
-
-    # Remove unnecessary spaces from names list and messages list
-    names = [name.strip() for name in names]
-    messages = [msg.strip() for msg in messages]
+        messages = [msg.strip() for msg in messages]
+    else:
+        messages = [messages]
 
     browser = pretty_input(f"{Fore.BLUE}Which browser to use?/What browser do you have installed? [ Chrome/FireFox ]").lower()
 
@@ -363,36 +376,35 @@ def main() -> None:
 
     # Check what browser user wished and initialize driver accordingly
     if browser.startswith("ch"):
-        try:
-            driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
-        except Exception as e:
-            log("error", "Unable to automatically install chromedriver!\nTrying manual mode instead...")
-            try:
-                # Use chromedriver, assuming it is in same path
-                path = os.path.abspath("./chromedriver" if OS.lower().startswith("lin") else "chromedriver.exe")
-                service = webdriver.Chrome(executable_path=path)
-                driver = webdriver.Chrome(service=service)
-            except Exception as e:
-                log("error", "Unable to get chromedriver manually!")
-                log("info", "Quitting...")
-                log("error",e)
-                sys.exit()
+        # Add options
+        options = ChromeOptions()
+
+        # Add data folder to options
+        options.add_argument(f"--user-data-dir={APP_DATA_PATH}")
+
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
     elif browser.startswith("fir"):
+        # Add options
+        options = FirefoxOptions()
+
+        # Add data folder to options
+        options.add_argument(f"--user-data-dir={APP_DATA_PATH}")
+
         try:
-            driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+            driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
         except Exception as e:
             log("error", "Unable to automatically install geckodriver!\nTrying manual mode instead...")
             try:
                 # Use geckodriver, assuming it is in same path
-                path = os.path.abspath("./geckodriver" if OS.lower().startswith("lin") else "geckodriver.exe")
+                path = "./geckodriver" if OS.lower().startswith("lin") else "geckodriver.exe"
                 service = FirefoxService(executable_path=path)
-                driver = webdriver.Firefox(service=service)
+                driver = webdriver.Firefox(service=service, options=options)
             except Exception as e:
                 log("error", "Unable to get geckodriver manually!")
                 log("info", "Quitting...")
                 sys.exit()
     else:
-        log("error", "Browser is not compatible!!")
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
     log("success", "Successfully initialized web driver!")
 
@@ -637,14 +649,56 @@ def credits_menu() -> None:
     input(f"{Fore.CYAN}| {APP_INPUT_COLOR}Press ENTER to return")
 
 
+def reset_cache() -> None:
+    clear_screen()
+
+    option = str()
+    errors = []
+
+    while True:
+        print_title()
+
+        for i, err in enumerate(errors):
+            if i == (len(errors) - 1):
+                pretty_print(Fore.RED + err, back_separator=False, front_separator=True)
+                break
+
+            if i == 0:
+                pretty_print(Fore.RED + err, back_separator=False, front_separator=False)
+                continue
+
+            pretty_print(Fore.RED + err, back_separator=False, front_separator=False)
+
+        pretty_print(f"{Fore.YELLOW}Are you sure, you want to reset the cache? {Fore.LIGHTRED_EX}You'll have to reauthorize whatsapp! [Y/N]", back_separator=False)
+
+        option = pretty_input("").lower()
+
+        if option.lower() == "y":
+            if os.path.exists(APP_DATA_PATH):
+                shutil.rmtree(APP_DATA_PATH)
+                pretty_print(f"{Fore.GREEN}The cache has been deleted!")
+                time.sleep(1)
+                break
+            else:
+                pretty_print(f"{Fore.RED}You have no cache!")
+                time.sleep(1)
+                break
+        elif option.lower() == "n":
+            break
+        else:
+            errors.append("Please enter a valid option!")
+            clear_screen()
+    return
+
+
 def main_menu() -> None:
     clear_screen()
 
     user_input = str()
 
-    possible_quit_commands = ["exit", "quit", "q", "end", "4", "e"]
+    possible_quit_commands = ["exit", "quit", "q", "end", "5", "e"]
 
-    options = ["1", "2", "3", "4", "start bot", "customizations", "credits"]
+    options = ["1", "2", "3", "4", "start bot", "customizations", "credits", "reset cache"]
 
     error_messages = []
 
@@ -656,7 +710,9 @@ def main_menu() -> None:
         pretty_print(f"{MAIN_MENU_OPTIONS_NUMBER_COLOR}1) {MAIN_MENU_OPTIONS_TEXT_COLOR}Start Bot", align="center", back_separator=False, front_separator=False)
         pretty_print(f"{MAIN_MENU_OPTIONS_NUMBER_COLOR}2) {MAIN_MENU_OPTIONS_TEXT_COLOR}Customizations/Settings", align="center", back_separator=False, front_separator=False)
         pretty_print(f"{MAIN_MENU_OPTIONS_NUMBER_COLOR}3) {MAIN_MENU_OPTIONS_TEXT_COLOR}Credits", align="center", back_separator=False, front_separator=False)
-        pretty_print(f"{MAIN_MENU_OPTIONS_NUMBER_COLOR}4) {MAIN_MENU_OPTIONS_TEXT_COLOR}Exit", align="center", back_separator=False)
+        pretty_print(f"{MAIN_MENU_OPTIONS_NUMBER_COLOR}4) {MAIN_MENU_OPTIONS_TEXT_COLOR}{Fore.RED}Reset Cache",
+                     align="center", back_separator=False, front_separator=False)
+        pretty_print(f"{MAIN_MENU_OPTIONS_NUMBER_COLOR}5) {MAIN_MENU_OPTIONS_TEXT_COLOR}Exit", align="center", back_separator=False)
 
         # Print Disclaimer
         pretty_print(f"{MAIN_MENU_DISCLAIMER_WARNING_COLOR}DO NOT USE FOR SPAM OR ANY OTHER MALICIOUS USE", align="center", back_separator=False)
@@ -675,8 +731,6 @@ def main_menu() -> None:
         # Print User Input Prompt
         user_input = pretty_input("")
 
-        # TODO: Options
-        # TODO: Make pretty print print big text on different lines
         if user_input in options:
             if user_input.startswith("1") or user_input.startswith("s"):
                 main()
@@ -684,6 +738,8 @@ def main_menu() -> None:
                 customizations_menu()
             elif user_input.startswith("3") or user_input.startswith("cr"):
                 credits_menu()
+            elif user_input.startswith("4") or user_input.startswith("re"):
+                reset_cache()
         else:
             error_messages.append(f"{Fore.YELLOW}Please choose a correct option! {Fore.LIGHTYELLOW_EX}Your previous option '{user_input}' is not valid!")
 
